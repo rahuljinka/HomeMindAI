@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import auth, rooms, objects, chat
+from backend.app.routers import auth, rooms, objects, chat
 
 app = FastAPI(title="HomeMind AI API")
 

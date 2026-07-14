@@ -10,11 +10,11 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 # Add the project root to sys.path to allow importing models
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from app.database.session import Base
-from app.models.user import User
-from app.models.memory import Room, Furniture, Container, Location, StoredObject, MemoryHistory, ChatSession, Message
+from backend.app.database.session import Base
+from backend.app.models.user import User
+from backend.app.models.memory import Room, Furniture, Container, Location, StoredObject, MemoryHistory, ChatSession, Message, ObjectAlias, ObjectPhoto, ObjectEmbedding
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

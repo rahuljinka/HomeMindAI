@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from typing import List
-from app.database.session import get_db
-from app.schemas.memory import StoredObjectCreate, StoredObjectResponse
-from app.repositories.memory_repository import MemoryRepository
-from app.middleware.auth import get_current_user
-from app.models.user import User
+from backend.app.database.session import get_db
+from backend.app.schemas.memory import StoredObjectCreate, StoredObjectResponse
+from backend.app.repositories.memory_repository import MemoryRepository
+from backend.app.middleware.auth import get_current_user
+from backend.app.models.user import User
+from backend.app.models.memory import Room, StoredObject
 
 router = APIRouter(prefix="/objects", tags=["objects"])
 
@@ -17,7 +19,8 @@ async def create_object(
 ):
     repo = MemoryRepository(db)
     # Check if room exists
-    room = await repo.get_room(obj.room_id, current_user.id)
+    result = await db.execute(select(Room).filter(Room.id == obj.room_id, Room.user_id == current_user.id))
+    room = result.scalars().first()
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
     
@@ -56,8 +59,8 @@ async def get_object(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    repo = MemoryRepository(db)
-    obj = await repo.get_object(object_id=object_id, user_id=current_user.id)
+    result = await db.execute(select(StoredObject).filter(StoredObject.id == object_id, StoredObject.user_id == current_user.id))
+    obj = result.scalars().first()
     if not obj:
         raise HTTPException(status_code=404, detail="Object not found")
     return obj
