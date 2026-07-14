@@ -35,6 +35,18 @@ class MemoryRepository:
         result = await self.db.execute(select(StoredObject).filter(StoredObject.user_id == user_id))
         return result.scalars().all()
 
+    async def search_objects(self, user_id: int, query: str) -> List[StoredObject]:
+        search_query = f"%{query}%"
+        result = await self.db.execute(
+            select(StoredObject).filter(
+                StoredObject.user_id == user_id,
+                (StoredObject.name.ilike(search_query)) | 
+                (StoredObject.description.ilike(search_query)) |
+                (StoredObject.category.ilike(search_query))
+            )
+        )
+        return result.scalars().all()
+
     async def get_object(self, object_id: int, user_id: int) -> Optional[StoredObject]:
         result = await self.db.execute(select(StoredObject).filter(StoredObject.id == object_id, StoredObject.user_id == user_id))
         return result.scalars().first()

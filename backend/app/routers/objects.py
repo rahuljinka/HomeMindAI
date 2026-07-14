@@ -41,10 +41,13 @@ async def create_object(
 
 @router.get("/", response_model=List[StoredObjectResponse])
 async def list_objects(
+    q: str = None,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     repo = MemoryRepository(db)
+    if q:
+        return await repo.search_objects(user_id=current_user.id, query=q)
     return await repo.get_objects(user_id=current_user.id)
 
 @router.get("/{object_id}", response_model=StoredObjectResponse)
