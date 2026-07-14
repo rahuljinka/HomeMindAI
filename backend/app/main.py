@@ -1,9 +1,12 @@
 from fastapi import FastAPI
-from backend.app.routers import auth
+from app.routers import auth, rooms, objects, chat
 
 app = FastAPI(title="HomeMind AI API")
 
 app.include_router(auth.router)
+app.include_router(rooms.router)
+app.include_router(objects.router)
+app.include_router(chat.router)
 
 @app.get("/health")
 async def health_check():
