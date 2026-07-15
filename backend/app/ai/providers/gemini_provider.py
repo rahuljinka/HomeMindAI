@@ -40,31 +40,44 @@ class GeminiProvider(AIProvider):
                 'system_instruction': system_prompt
             }
 
-        try:
-            # google-genai SDK 0.x models are mostly synchronous in the current version
-            # or use a different client for async. 
-            # To keep it simple and safe within the current architecture:
-            loop = asyncio.get_event_loop()
-            response = await loop.run_in_executor(
-                None,
-                lambda: self.client.models.generate_content(
-                    model=self.model_name,
-                    contents=prompt,
-                    config=types.GenerateContentConfig(**config)
+        max_retries = 3
+        base_delay = 1  # seconds
+        
+        for attempt in range(max_retries + 1):
+            try:
+                # google-genai SDK 0.x models are mostly synchronous in the current version
+                # or use a different client for async. 
+                # To keep it simple and safe within the current architecture:
+                loop = asyncio.get_event_loop()
+                response = await loop.run_in_executor(
+                    None,
+                    lambda: self.client.models.generate_content(
+                        model=self.model_name,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(**config)
+                    )
                 )
-            )
 
-            if response_model:
-                try:
-                    parsed_data = json.loads(response.text)
-                    logger.debug(f"Gemini parsed output: {parsed_data}")
-                    return parsed_data
-                except Exception as e:
-                    logger.error(f"Failed to parse Gemini JSON output: {e}. Raw: {response.text}")
-                    raise ValueError(f"AI returned invalid structured data: {str(e)}")
-            else:
-                return {"content": response.text}
+                if response_model:
+                    try:
+                        parsed_data = json.loads(response.text)
+                        logger.debug(f"Gemini parsed output: {parsed_data}")
+                        return parsed_data
+                    except Exception as e:
+                        logger.error(f"Failed to parse Gemini JSON output: {e}. Raw: {response.text}")
+                        raise ValueError(f"AI returned invalid structured data: {str(e)}")
+                else:
+                    return {"content": response.text}
 
-        except Exception as e:
-            logger.error(f"Error calling Gemini API ({self.model_name}): {e}", exc_info=True)
-            raise
+            except Exception as e:
+                # Check for transient errors (rate limits, service unavailable, etc.)
+                is_transient = any(err in str(e).lower() for err in ["429", "503", "quota", "overloaded", "unavailable"])
+                
+                if is_transient and attempt < max_retries:
+                    delay = base_delay * (2 ** attempt)
+                    logger.warning(f"Transient error calling Gemini API: {e}. Retrying in {delay}s (attempt {attempt + 1}/{max_retries})")
+                    await asyncio.sleep(delay)
+                    continue
+                
+                logger.error(f"Error calling Gemini API ({self.model_name}): {e}", exc_info=True)
+                raise
