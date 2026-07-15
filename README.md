@@ -10,9 +10,13 @@ Personal AI memory assistant that remembers where physical objects are located i
 - **History Tracking:** Automatic logging of object movements and storage reasons.
 
 ## Tech Stack
-- **Backend:** FastAPI, PostgreSQL (pgvector), Redis, SQLAlchemy, Google Gemini API (gemini-3.5-flash)
+- **Backend:** FastAPI, PostgreSQL (pgvector), Redis, SQLAlchemy, Google Gemini API (gemini-3.1-flash-lite)
 - **Frontend:** React Native (Expo), TypeScript, React Query, Axios
 - **Infrastructure:** Docker, Docker Compose
+
+## AI Provider:
+- **Google Gemini**
+- **Development Model:** Gemini 3.1 Flash Lite
 
 ## Getting Started
 
@@ -27,7 +31,7 @@ Personal AI memory assistant that remembers where physical objects are located i
    DATABASE_URL=postgresql+asyncpg://user:password@db/homemind
    REDIS_URL=redis://redis:6379/0
    GEMINI_API_KEY=your_key_here
-   AI_MODEL=gemini-3.5-flash
+   AI_MODEL=gemini-3.1-flash-lite
    JWT_SECRET=your_secret_here
    ALGORITHM=HS256
    ```
