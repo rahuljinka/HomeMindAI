@@ -2,80 +2,98 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 
-# House Schemas
-class HouseBase(BaseModel):
+# --- Minimal Schemas ---
+
+class HouseMinimalResponse(BaseModel):
+    id: int
     name: str
     description: Optional[str] = None
-
-class HouseCreate(HouseBase):
-    pass
-
-class HouseResponse(HouseBase):
-    id: int
     user_id: int
-    created_at: datetime
-    updated_at: datetime
 
     class Config:
         from_attributes = True
 
-# Room Schemas
-class RoomBase(BaseModel):
+class RoomMinimalResponse(BaseModel):
+    id: int
+    name: str
+    description: Optional[str] = None
+    user_id: int
+    house_id: Optional[int] = None
+    house: Optional[HouseMinimalResponse] = None
+
+    class Config:
+        from_attributes = True
+
+class FurnitureMinimalResponse(BaseModel):
+    id: int
+    name: str
+    type: Optional[str] = None
+    room_id: int
+
+    class Config:
+        from_attributes = True
+
+class ContainerMinimalResponse(BaseModel):
+    id: int
+    name: str
+    furniture_id: int
+
+    class Config:
+        from_attributes = True
+
+# --- Full Schemas ---
+
+class FurnitureResponse(FurnitureMinimalResponse):
+    containers: List[ContainerMinimalResponse] = []
+
+    class Config:
+        from_attributes = True
+
+class RoomResponse(RoomMinimalResponse):
+    furniture: List[FurnitureResponse] = []
+
+    class Config:
+        from_attributes = True
+
+class HouseResponse(HouseMinimalResponse):
+    created_at: datetime
+    updated_at: datetime
+    rooms: List[RoomResponse] = []
+
+    class Config:
+        from_attributes = True
+
+# --- Create Schemas ---
+
+class HouseCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+class RoomCreate(BaseModel):
     name: str
     description: Optional[str] = None
     house_id: Optional[int] = None
 
-class RoomCreate(RoomBase):
-    pass
-
-class RoomResponse(RoomBase):
-    id: int
-    user_id: int
-    house: Optional[HouseResponse] = None
-
-    class Config:
-        from_attributes = True
-
-# Furniture Schemas
-class FurnitureBase(BaseModel):
+class FurnitureCreate(BaseModel):
     name: str
     type: Optional[str] = None
-
-class FurnitureCreate(FurnitureBase):
     room_id: int
 
-class FurnitureResponse(FurnitureBase):
-    id: int
-    room_id: int
-
-    class Config:
-        from_attributes = True
-
-# Container Schemas
-class ContainerBase(BaseModel):
+class ContainerCreate(BaseModel):
     name: str
-
-class ContainerCreate(ContainerBase):
     furniture_id: int
 
-class ContainerResponse(ContainerBase):
-    id: int
-    furniture_id: int
+# --- Location & Object Schemas ---
 
-    class Config:
-        from_attributes = True
-
-# Location Schemas
 class LocationResponse(BaseModel):
     id: int
-    room: Optional[RoomResponse] = None
-    furniture: Optional[FurnitureResponse] = None
-    container: Optional[ContainerResponse] = None
+    room: Optional[RoomMinimalResponse] = None
+    furniture: Optional[FurnitureMinimalResponse] = None
+    container: Optional[ContainerMinimalResponse] = None
 
     class Config:
         from_attributes = True
 
-# Object Schemas
 class StoredObjectBase(BaseModel):
     name: str
     category: Optional[str] = None
@@ -96,7 +114,6 @@ class StoredObjectResponse(StoredObjectBase):
     class Config:
         from_attributes = True
 
-# History Schemas
 class MemoryHistoryResponse(BaseModel):
     id: int
     object_id: int
@@ -107,3 +124,7 @@ class MemoryHistoryResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# Update forward refs
+RoomResponse.update_forward_refs()
+HouseResponse.update_forward_refs()

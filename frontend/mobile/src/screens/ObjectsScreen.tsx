@@ -10,7 +10,7 @@ interface StoredObject {
   category?: string;
   description?: string;
   current_location?: {
-    room: { 
+    room?: { 
       name: string;
       house?: { name: string };
     };
