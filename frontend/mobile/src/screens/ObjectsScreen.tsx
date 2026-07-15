@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Search, Package, MapPin } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
 import apiClient from '../api/client';
 
 interface StoredObject {
@@ -9,7 +10,10 @@ interface StoredObject {
   category?: string;
   description?: string;
   current_location?: {
-    room: { name: string };
+    room: { 
+      name: string;
+      house?: { name: string };
+    };
     furniture?: { name: string };
     container?: { name: string };
   };
@@ -17,6 +21,7 @@ interface StoredObject {
 }
 
 export default function ObjectsScreen() {
+  const navigation = useNavigation<any>();
   const [objects, setObjects] = useState<StoredObject[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -25,7 +30,7 @@ export default function ObjectsScreen() {
   const fetchObjects = async (query = '') => {
     try {
       setLoading(true);
-      const endpoint = query ? `/search?q=${query}` : '/objects/';
+      const endpoint = query ? `/objects/?q=${query}` : '/objects/';
       const response = await apiClient.get(endpoint);
       setObjects(response.data);
     } catch (error) {
@@ -46,7 +51,10 @@ export default function ObjectsScreen() {
   };
 
   const renderObject = ({ item }: { item: StoredObject }) => (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity 
+      style={styles.card}
+      onPress={() => navigation.navigate('ObjectDetail', { object: item })}
+    >
       <View style={styles.cardHeader}>
         <Package size={20} color="#007AFF" />
         <Text style={styles.objectName}>{item.name}</Text>
@@ -57,6 +65,7 @@ export default function ObjectsScreen() {
         <MapPin size={16} color="#666" />
         <Text style={styles.locationText}>
           {[
+            item.current_location?.room?.house?.name,
             item.current_location?.room?.name,
             item.current_location?.furniture?.name,
             item.current_location?.container?.name

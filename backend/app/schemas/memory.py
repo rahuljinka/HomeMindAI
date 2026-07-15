@@ -31,6 +31,7 @@ class RoomCreate(RoomBase):
 class RoomResponse(RoomBase):
     id: int
     user_id: int
+    house: Optional[HouseResponse] = None
 
     class Config:
         from_attributes = True
@@ -67,9 +68,9 @@ class ContainerResponse(ContainerBase):
 # Location Schemas
 class LocationResponse(BaseModel):
     id: int
-    room_id: int
-    furniture_id: Optional[int] = None
-    container_id: Optional[int] = None
+    room: Optional[RoomResponse] = None
+    furniture: Optional[FurnitureResponse] = None
+    container: Optional[ContainerResponse] = None
 
     class Config:
         from_attributes = True
@@ -88,7 +89,7 @@ class StoredObjectCreate(StoredObjectBase):
 class StoredObjectResponse(StoredObjectBase):
     id: int
     user_id: int
-    current_location_id: Optional[int]
+    current_location: Optional[LocationResponse] = None
     created_at: datetime
     updated_at: Optional[datetime]
 

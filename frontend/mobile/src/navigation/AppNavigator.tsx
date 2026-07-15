@@ -12,9 +12,33 @@ import ChatScreen from '../screens/ChatScreen';
 import ObjectsScreen from '../screens/ObjectsScreen';
 import RoomsScreen from '../screens/RoomsScreen';
 import HousesScreen from '../screens/HousesScreen';
+import ObjectDetailScreen from '../screens/ObjectDetailScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+function ObjectsStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="Objects" 
+        component={ObjectsScreen} 
+        options={{ 
+          headerTitle: 'My Objects',
+          headerShown: true,
+        }} 
+      />
+      <Stack.Screen 
+        name="ObjectDetail" 
+        component={ObjectDetailScreen} 
+        options={{ 
+          headerTitle: 'Object Details',
+          headerShown: false, // We use a custom header in ObjectDetailScreen
+        }} 
+      />
+    </Stack.Navigator>
+  );
+}
 
 function RoomsStack() {
   return (
@@ -55,12 +79,11 @@ function MainTabs() {
       />
       <Tab.Screen 
         name="ObjectsTab" 
-        component={ObjectsScreen} 
+        component={ObjectsStack} 
         options={{ 
           title: 'Objects',
           tabBarIcon: (props) => <Package size={props.size} color={props.color} />,
-          headerTitle: 'My Objects',
-          headerShown: true,
+          headerShown: false,
         }} 
       />
       <Tab.Screen 

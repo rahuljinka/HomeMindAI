@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 from typing import List
 from app.database.session import get_db
 from app.schemas.memory import StoredObjectCreate, StoredObjectResponse
 from app.repositories.memory_repository import MemoryRepository
 from app.middleware.auth import get_current_user
 from app.models.user import User
-from app.models.memory import Room, StoredObject
+from app.models.memory import Room, StoredObject, Location
 
 router = APIRouter(prefix="/objects", tags=["objects"])
 
@@ -59,7 +60,16 @@ async def get_object(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    result = await db.execute(select(StoredObject).filter(StoredObject.id == object_id, StoredObject.user_id == current_user.id))
+    repo = MemoryRepository(db)
+    result = await db.execute(
+        select(StoredObject)
+        .filter(StoredObject.id == object_id, StoredObject.user_id == current_user.id)
+        .options(
+            selectinload(StoredObject.current_location).selectinload(Location.room).selectinload(Room.house),
+            selectinload(StoredObject.current_location).selectinload(Location.furniture),
+            selectinload(StoredObject.current_location).selectinload(Location.container)
+        )
+    )
     obj = result.scalars().first()
     if not obj:
         raise HTTPException(status_code=404, detail="Object not found")

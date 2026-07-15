@@ -35,7 +35,11 @@ class MemoryRepository:
         filters = [Room.user_id == user_id]
         if house_id:
             filters.append(Room.house_id == house_id)
-        result = await self.db.execute(select(Room).filter(*filters))
+        result = await self.db.execute(
+            select(Room)
+            .filter(*filters)
+            .options(selectinload(Room.house))
+        )
         return result.scalars().all()
 
     async def get_room_by_name(self, user_id: int, name: str, house_id: Optional[int] = None) -> Optional[Room]:
