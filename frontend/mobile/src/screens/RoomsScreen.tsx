@@ -10,7 +10,7 @@ interface Room {
   description?: string;
 }
 
-export default function RoomsScreen({ route }: any) {
+export default function RoomsScreen({ route, navigation }: any) {
   const houseId = route?.params?.houseId;
   const houseName = route?.params?.houseName;
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -49,7 +49,16 @@ export default function RoomsScreen({ route }: any) {
   };
 
   const renderRoom = ({ item }: { item: Room }) => (
-    <TouchableOpacity style={styles.roomCard}>
+    <TouchableOpacity 
+      style={styles.roomCard}
+      onPress={() => navigation.navigate('LocationsTab', { 
+        screen: 'Locations', 
+        params: { initialBreadcrumbs: [
+          { type: 'HOUSES', id: houseId, name: houseName },
+          { type: 'ROOMS', id: item.id, name: item.name }
+        ]} 
+      })}
+    >
       <View style={styles.roomIcon}>
         <Home size={24} color="#007AFF" />
       </View>
@@ -105,7 +114,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee'
   },
-  headerTitle: { fontSize: 24, fontWeight: '700', color: '#333' },
+  headerTitle: { fontSize: 24, fontWeight: '700', color: '#333', maxWidth: '80%' },
   logoutButton: { padding: 8 },
   list: { padding: 15 },
   roomCard: { 

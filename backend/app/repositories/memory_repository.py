@@ -17,7 +17,15 @@ class MemoryRepository:
         return house
 
     async def get_houses(self, user_id: int) -> List[House]:
-        result = await self.db.execute(select(House).filter(House.user_id == user_id))
+        result = await self.db.execute(
+            select(House)
+            .filter(House.user_id == user_id)
+            .options(
+                selectinload(House.rooms)
+                .selectinload(Room.furniture)
+                .selectinload(Furniture.containers)
+            )
+        )
         return result.scalars().all()
 
     async def get_house_by_name(self, user_id: int, name: str) -> Optional[House]:
@@ -38,7 +46,11 @@ class MemoryRepository:
         result = await self.db.execute(
             select(Room)
             .filter(*filters)
-            .options(selectinload(Room.house))
+            .options(
+                selectinload(Room.house),
+                selectinload(Room.furniture)
+                .selectinload(Furniture.containers)
+            )
         )
         return result.scalars().all()
 

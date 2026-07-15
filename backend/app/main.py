@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
-from app.routers import auth, rooms, objects, chat, houses
+from app.routers import auth, rooms, objects, chat, houses as locations
 
 app = FastAPI(title="HomeMind AI API")
 
@@ -18,7 +18,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
-app.include_router(houses.router)
+app.include_router(locations.router)
 app.include_router(rooms.router)
 app.include_router(objects.router)
 app.include_router(chat.router)

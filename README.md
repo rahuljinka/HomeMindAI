@@ -4,7 +4,7 @@ Personal AI memory assistant that remembers where physical objects are located i
 
 ## Features
 - **AI Memory Pipeline:** Natural language intent detection and entity extraction.
-- **Hierarchical Locations:** Objects are stored in Room -> Furniture -> Container.
+- **Hierarchical Locations:** Objects are stored in House -> Room -> Furniture -> Container.
 - **Mobile First:** React Native app for seamless interaction.
 - **Clean Architecture:** Modular backend with provider abstraction for AI.
 - **History Tracking:** Automatic logging of object movements and storage reasons.

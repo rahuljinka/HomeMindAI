@@ -11,7 +11,7 @@ import RegisterScreen from '../screens/RegisterScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ObjectsScreen from '../screens/ObjectsScreen';
 import RoomsScreen from '../screens/RoomsScreen';
-import HousesScreen from '../screens/HousesScreen';
+import LocationsScreen from '../screens/LocationsScreen';
 import ObjectDetailScreen from '../screens/ObjectDetailScreen';
 
 const Stack = createStackNavigator();
@@ -40,13 +40,21 @@ function ObjectsStack() {
   );
 }
 
-function RoomsStack() {
+function LocationsStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen 
-        name="Houses" 
-        component={HousesScreen} 
+        name="Locations" 
+        component={LocationsScreen} 
         options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="ObjectDetail" 
+        component={ObjectDetailScreen} 
+        options={{ 
+          headerTitle: 'Object Details',
+          headerShown: false,
+        }} 
       />
       <Stack.Screen 
         name="Rooms" 
@@ -87,10 +95,10 @@ function MainTabs() {
         }} 
       />
       <Tab.Screen 
-        name="RoomsTab" 
-        component={RoomsStack} 
+        name="LocationsTab" 
+        component={LocationsStack} 
         options={{ 
-          title: 'Houses',
+          title: 'Locations',
           tabBarIcon: (props) => <HomeIcon size={props.size} color={props.color} />,
           headerShown: false,
         }} 
